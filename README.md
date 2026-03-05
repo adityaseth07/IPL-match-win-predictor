@@ -4,11 +4,22 @@ A machine learning project that predicts the probability of winning in Indian Pr
 
 ---
 
+## 🌐 Live Web App
+
+You can try the deployed application here:
+
+**🔗 Live App:**
+https://t20-match-win-predictor-07.streamlit.app/
+
+---
+
 ## 📋 Project Overview
 
 This project analyzes historical IPL match data to predict the likelihood of a batting team winning based on match situations. It uses features like current runs, remaining wickets, balls remaining, and run rates to make predictions.
 
 **Model Accuracy**: ~58% win probability predictions
+
+⚠ **Note:** Predictions may be less accurate for **targets below ~120 runs** because such low-score chases occur rarely in IPL matches and are underrepresented in the training data.
 
 ---
 
@@ -24,9 +35,9 @@ ipl/
 ├── requirements.txt           # Python dependencies
 ├── .gitignore                 # Git ignore rules
 └── README.md                  # This file
+```
 
 **Note**: The trained model (`model.pkl`) is hosted on Hugging Face and downloaded automatically when the app runs.
-```
 
 ---
 
@@ -35,23 +46,26 @@ ipl/
 The trained Random Forest model is hosted on **Hugging Face Hub** for easy access and deployment.
 
 ### Model Details
-- **Model Name**: cricket-win-predictor-model
-- **Platform**: Hugging Face Hub
-- **URL**: https://huggingface.co/adityaseth07/cricket-win-predictor-model
-- **Auto-Download**: The Streamlit app automatically downloads the model on first run
+
+* **Model Name**: cricket-win-predictor-model
+* **Platform**: Hugging Face Hub
+* **URL**: https://huggingface.co/adityaseth07/cricket-win-predictor-model
+* **Auto-Download**: The Streamlit app automatically downloads the model on first run
 
 ### How It Works
+
 1. When you run `streamlit run main.py`, the app checks if `model.pkl` exists locally
 2. If not found, it automatically downloads the model from Hugging Face
 3. The model is cached for subsequent runs (no re-download needed)
 
 ### Manual Download (Optional)
-If you want to manually download the model:
+
 ```bash
 wget https://huggingface.co/adityaseth07/cricket-win-predictor-model/resolve/main/model.pkl
 ```
 
 Or using Python:
+
 ```python
 import urllib.request
 url = "https://huggingface.co/adityaseth07/cricket-win-predictor-model/resolve/main/model.pkl"
@@ -60,186 +74,160 @@ urllib.request.urlretrieve(url, "model.pkl")
 
 ---
 
-### Input Parameters for Prediction
-- **Current Runs**: Total runs scored by batting team
-- **Wickets Left**: Number of wickets remaining (0-10)
-- **Balls Remaining**: Balls left in the over (0-120)
-- **Current Run Rate**: Runs per over
-- **Target Runs**: Total runs needed to win
+## 📊 Input Parameters for Prediction
 
-### Model Features
+* **Current Runs**: Total runs scored by batting team
+* **Wickets Left**: Number of wickets remaining (0–10)
+* **Balls Remaining**: Balls left in the innings (0–120)
+* **Current Run Rate**: Runs per over
+* **Target Runs**: Total runs needed to win
+
+---
+
+## 📈 Model Features
+
 The trained Random Forest uses 6 key features:
-1. `team_runs` - Current runs by batting team
-2. `wickets_left` - Remaining wickets (10 - current wickets)
-3. `balls_remaining` - Balls left in the innings
-4. `current_run_rate` - Scoring rate (runs / overs)
-5. `runs_remaining` - Runs needed to win
-6. `required_run_rate` - Run rate required to achieve target
+
+1. `team_runs` — Current runs by batting team
+2. `wickets_left` — Remaining wickets (10 − wickets fallen)
+3. `balls_remaining` — Balls left in the innings
+4. `current_run_rate` — Current scoring rate (runs / overs)
+5. `runs_remaining` — Runs needed to win
+6. `required_run_rate` — Run rate required to achieve target
 
 ---
 
 ## 📦 Installation
 
 ### Prerequisites
-- Python 3.7+
-- pip (Python package manager)
+
+* Python 3.7+
+* pip (Python package manager)
 
 ### Setup Steps
 
-1. **Clone/Navigate to the project directory**
-   ```bash
-   cd "c:\Users\adity\OneDrive\ドキュメント\data analysis\ipl"
-   ```
+1️⃣ Clone or navigate to the project directory
 
-2. **Create a virtual environment (optional but recommended)**
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate
-   ```
+```bash
+cd "c:\Users\adity\OneDrive\ドキュメント\data analysis\ipl"
+```
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+2️⃣ Create a virtual environment (optional)
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+3️⃣ Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
 ## 📊 Project Workflow
 
 ### Step 1: Data Processing (`data.ipynb`)
-- Loads raw IPL match data
-- Selects relevant columns
-- Creates derived features:
-  - `balls_bowled`: Total balls faced
-  - `balls_remaining`: Balls left in innings (120 - balls_bowled)
-  - `wickets_left`: Wickets remaining (10 - wickets_down)
-  - `current_run_rate`: Runs per over (handles division by zero)
-  - `runs_remaining`: Target - current runs
-  - `overs_remaining`: Balls remaining / 6
-  - `required_run_rate`: Runs needed per over
-- Handles infinity and NaN values properly
-- Exports cleaned data to `cleaned_ipl.csv`
+
+* Loads raw IPL match data
+* Selects relevant columns
+* Creates derived features:
+
+  * `balls_bowled`
+  * `balls_remaining`
+  * `wickets_left`
+  * `current_run_rate`
+  * `runs_remaining`
+  * `overs_remaining`
+  * `required_run_rate`
+* Handles NaN and infinite values
+* Exports cleaned dataset → `cleaned_ipl.csv`
+
+---
 
 ### Step 2: Model Training (`model_train.ipynb`)
-- Loads cleaned IPL data
-- Encodes categorical variables (batting_team, bowling_team) using one-hot encoding
-- Creates target variable: `batting_team_win` (1 if batting team won, 0 otherwise)
-- Splits data: 80% training, 20% testing
-- Trains Random Forest Classifier (100 trees)
-- Evaluates model accuracy on test set
-- Exports trained model to `model.pkl`
+
+* Loads cleaned IPL data
+* Encodes categorical variables
+* Creates target variable: `batting_team_win`
+* Train/test split (80/20)
+* Trains **Random Forest Classifier**
+* Exports trained model → `model.pkl`
+
+---
 
 ### Step 3: Web Application (`main.py`)
-- Interactive Streamlit app for real-time predictions
-- Automatically downloads trained model from Hugging Face (cached for reuse)
-- User inputs match situation parameters
-- Calculates derived features (runs_remaining, required_run_rate)
-- Predicts win probability using trained model
-- Displays probability as percentage
+
+Interactive Streamlit app that:
+
+* Loads trained model from Hugging Face
+* Accepts user match inputs
+* Calculates derived features
+* Predicts win probability
+* Displays results visually with probability bars
 
 ---
 
 ## 🎯 Usage
 
-### Option 1: Using the Streamlit Web App (Recommended)
+### Run the Web App
 
 ```bash
 streamlit run main.py
 ```
 
-Then:
-1. Open your browser to `http://localhost:8501`
-2. Enter match parameters:
-   - Current Runs (0-300)
-   - Wickets Left (0-10)
-   - Balls Remaining (0-120)
-   - Current Run Rate (0.0-20.0)
-   - Target Runs (0-300)
-3. Click "Predict Win Probability"
-4. View the prediction result
+Open:
 
-### Option 2: Using Jupyter Notebooks
-
-1. **Data Processing**
-   ```bash
-   jupyter notebook data.ipynb
-   ```
-   - Run all cells to generate `cleaned_ipl.csv`
-
-2. **Model Training**
-   ```bash
-   jupyter notebook model_train.ipynb
-   ```
-   - Run all cells to train and save the model
-   - Test predictions with different match scenarios
-
-### Option 3: Python Script (Custom)
-
-```python
-import pandas as pd
-import pickle
-
-# Load model
-model = pickle.load(open("model.pkl", "rb"))
-
-# Example prediction
-team_runs = 120
-wickets_left = 6
-balls_remaining = 30
-current_run_rate = 8.5
-target = 160
-
-# Calculate derived features
-overs_remaining = balls_remaining / 6
-runs_remaining = target - team_runs
-required_run_rate = runs_remaining / overs_remaining if overs_remaining > 0 else 0
-
-# Make prediction
-sample = pd.DataFrame([[
-    team_runs, wickets_left, balls_remaining, 
-    current_run_rate, runs_remaining, required_run_rate
-]], columns=['team_runs','wickets_left','balls_remaining',
-             'current_run_rate','runs_remaining','required_run_rate'])
-
-probability = model.predict_proba(sample)[0][1]
-print(f"Win Probability: {round(probability*100, 2)}%")
 ```
+http://localhost:8501
+```
+
+Enter match details and click **Predict Win Probability**.
 
 ---
 
 ## 📈 Model Performance
 
-- **Algorithm**: Random Forest Classifier
-- **Features Used**: 6 derived features
-- **Train/Test Split**: 80/20
-- **Sample Prediction**: 
-  - Input: 120 runs, 6 wickets, 30 balls remaining, 8.5 run rate, target 160
-  - Output: 58% win probability
+* **Algorithm:** Random Forest Classifier
+* **Features Used:** 6 engineered features
+* **Train/Test Split:** 80/20
+
+Example prediction:
+
+```
+Input:
+120 runs
+6 wickets left
+30 balls remaining
+Current RR = 8.5
+Target = 160
+
+Output:
+≈58% win probability
+```
 
 ---
 
 ## 🔧 Technical Details
 
 ### Data Handling
-- **Null Values**: Removed after feature engineering
-- **Infinity Values**: Replaced with 0 (prevents division errors)
-- **One-Hot Encoding**: Applied to team names for model compatibility
 
-### Feature Engineering
-- **Derived Features**: Calculated from raw data to improve predictions
-- **Normalization**: Features maintain their natural units (runs, overs, rates)
-- **Edge Cases**: Division by zero handled properly for edge cases
+* Null values removed
+* Infinite values replaced with 0
+* Feature engineering applied
 
-### Model Details
-- **Algorithm**: RandomForestClassifier (100 estimators)
-- **Target**: Binary classification (Win/Loss)
-- **Prediction Output**: Probability of batting team winning
+### Model
+
+* RandomForestClassifier
+* Binary classification
+* Probability-based predictions
 
 ---
 
 ## 📝 Requirements
 
-See `requirements.txt`:
 ```
 streamlit
 pandas
@@ -248,58 +236,35 @@ scikit-learn
 
 ---
 
-## ⚠️ Important Notes
+## ⚠️ Limitations
 
-1. **Feature Calculation**: All required features must be calculated correctly for accurate predictions
-2. **Target Parameter**: Must be provided for prediction (total runs to win)
-3. **Data Range**: Inputs should be realistic T20 values
-4. **Model Retraining**: Retrain model if using new/updated IPL data
+* Predictions may be **less reliable for targets below ~120 runs** due to limited training examples.
+* Model does not consider:
 
----
+  * Venue
+  * Pitch conditions
+  * Batting lineup strength
+  * Toss outcome
+  * Match pressure situations
 
-## 🐛 Troubleshooting
-
-### "File not found" error
-- Ensure all CSV files are in the correct directory
-- Check that `model.pkl` exists after training
-
-### "Column not found" error
-- Verify `cleaned_ipl.csv` was generated from `data.ipynb`
-- Restart the notebook kernel
-
-### Streamlit app not loading
-- Install Streamlit: `pip install streamlit`
-- Run from correct directory
-- Check Python version (3.7+)
+These factors can influence real match outcomes.
 
 ---
 
 ## 💡 Future Improvements
 
-- Add more features (venue, season, weather data)
-- Implement hyperparameter tuning
-- Try ensemble methods (Gradient Boosting, XGBoost)
-- Add confidence intervals for predictions
-- Deploy as REST API using Flask/FastAPI
-- Add historical performance analysis
-- Implement cross-validation
-
----
-
-## 📄 License
-
-This project is for educational purposes using publicly available IPL data.
+* Add **team and venue features**
+* Train with **larger IPL datasets**
+* Experiment with **XGBoost / Gradient Boosting**
+* Add **probability charts across overs**
+* Deploy REST API
+* Add historical match simulations
 
 ---
 
 ## 👨‍💻 Author
 
-Created for cricket analytics and machine learning practice
+Aditya Seth
+Machine Learning & Cricket Analytics Project
 
-**Last Updated**: 2026-03-05
-
----
-
-## 📧 Support
-
-For issues or questions about the project, check the notebook comments or review the feature engineering steps in `data.ipynb`.
+**Last Updated:** 2026-03-05
