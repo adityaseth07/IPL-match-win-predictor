@@ -17,7 +17,7 @@ https://t20-match-win-predictor-07.streamlit.app/
 
 This project analyzes historical IPL match data to predict the likelihood of a batting team winning based on match situations. It uses features like current runs, remaining wickets, balls remaining, and run rates to make predictions.
 
-**Model Accuracy**: ~58% win probability predictions
+**Model Accuracy**: ~71% win probability predictions
 
 ⚠ **Note:** Predictions may be less accurate for **targets below ~120 runs** because such low-score chases occur rarely in IPL matches and are underrepresented in the training data.
 
